@@ -19,6 +19,9 @@ template <class T>class Vector3D
     void norm();
     void mult (T n);
     void div (T n);
+    void rotateX (float angle);
+    void rotateY (float angle);
+    
     void add (Vector3D<T>& v);
     void set (Vector3D<T>& v);
     void sub (Vector3D<T>& v);
@@ -35,9 +38,12 @@ template <class T>class Vector3D
 };
 class TrigFn {
   public:
-    inline float get(int n) {
+    inline float get(float angle) {
+      int n = (int) (angle * 180.0 / PI) % 360;
+      if (n < 0) n +=360;
       return _val[n];
     };
+
   protected:
     float _val[360];
 };
@@ -45,8 +51,8 @@ class TrigFn {
 class TrigCos: public TrigFn {
   public:
     TrigCos() {
-      for (int n = 0; n < 360; n++) {
-        _val[n] = cos((float) n * PI / 180);
+      for (float n = 0; n < 360; n++) {
+        _val[(int) n] = cos((float) n * PI / 180.0);
       }
     }
 };
@@ -55,7 +61,7 @@ class TrigSin: public TrigFn {
 public:
     TrigSin() {
       for (int n = 0; n < 360; n++) {
-        _val[n] = sin((float) n * PI / 180);
+        _val[n] = sin((float) n * PI / 180.0);
       }
     }
 };
@@ -90,6 +96,11 @@ public:
 
     }
 };
+extern TrigAtan atan2_;
+extern TrigCos cos_;
+extern TrigSin sin_;
+
+
 
 typedef Vector3D<float> FVector3D;
 typedef Vector3D<int16_t> IVector3D;

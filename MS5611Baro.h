@@ -1,6 +1,6 @@
 
-#ifndef __AFBMP180_H__
-#define __AFBMP180_H__
+#ifndef __MS5611BARO_H__
+#define __MS5611BARO_H__
 
 #include <Arduino.h>
 
@@ -9,21 +9,22 @@
 #include "LPF.h"
 #include "Baro.h"
 
+#define MS5611_ADDR 0x77
 
-#define BMP180_ADDR 0x77 // 7-bit address
 
-#define BMP180_REG_CONTROL 0xF4
-#define BMP180_REG_RESULT 0xF6
 
-#define BMP180_COMMAND_TEMPERATURE 0x2E
-#define BMP180_COMMAND_PRESSURE0 0x34
-#define BMP180_COMMAND_PRESSURE1 0x74
-#define BMP180_COMMAND_PRESSURE2 0xB4
-#define BMP180_COMMAND_PRESSURE3 0xF4
+#define MS5611_RAWADC       0x00
+#define MS5611_RESET        0x1E
+#define MS5611_PRESSURE     0x48
+#define MS5611_TEMPERATURE  0x58
+#define MS5611_CALIBRATION  0xA2
+
+
+
 #define CYCLE_DURATION 25000
 
 #define CYCLE_TICKS (CYCLE_DURATION / TIME_STEP)
-class AFBMP180 : public IBaro {
+class MS5611Baro : public IBaro {
   public:
     void begin(TwoWire* pWire);
     void updateReading();
@@ -31,34 +32,26 @@ class AFBMP180 : public IBaro {
     float getAltitude();
     float getVelocity();
 
-
-
   private:
-
     void startTemperature();
-
     void readTemperature();
-
     void startPressure();
-
     void readPressure();
 
     I2CDevice* m_pDevice;
     LPF m_lpfPressure;
 
-    int32_t m_B5;
-
-    double m_A0;
-
     int m_tick = 0;
     struct {
-      int16_t ac1, mb;
-      int32_t ac2 , ac3, b1, b2, mc, md;
-      uint32_t ac4;
-      int32_t ac5, ac6;
+      unsigned long C1, C2, C3, C4, C5, C6;
     } m_cal;
 
+    uint8_t m_rawData[3];
+    uint32_t m_rawPressure;
+
     float m_alt = 0;
+    float m_A0 = 0;
+    
     float m_lastAlt = 0;
     float m_velocity = 0;
 };

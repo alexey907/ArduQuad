@@ -43,6 +43,26 @@ template <class T> void Vector3D<T>::norm() {
   div(mag());
 }
 
+
+template <class T> void Vector3D<T>::rotateX(float angle) {
+  
+  
+  T y1 = this->y * cos_.get(angle)  - this->z * sin_.get(angle);
+  T z1 = this->y * sin_.get(angle)  + this->z * cos_.get(angle);
+  
+  this->y = y1;
+  this->z = z1;
+}
+
+template <class T> void Vector3D<T>::rotateY(float angle) {
+  T x1 = this->z * sin_.get(angle)  + this->x * cos_.get(angle);
+  T z1 = this->z * cos_.get(angle)  - this->x * sin_.get(angle);
+  
+  this->x = x1;
+  this->z = z1;
+}
+
+
 template <class T> void Vector3D<T>::mult(T n) {
   this->x *= n;
   this->y *= n;
@@ -93,6 +113,10 @@ template <class T> void Vector3D<T>::print(Print* p) {
 
 template class Vector3D<float>;
 template class Vector3D<int>;
+TrigAtan atan2_;
+TrigSin sin_;
+TrigCos cos_;
+
 
 
 

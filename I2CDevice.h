@@ -11,7 +11,9 @@ class I2CDevice{
     int16_t readInt(uint8_t reg);
     uint16_t readUInt(uint8_t reg);
     void readBytes(uint8_t reg, uint8_t* data, int size);
-    void writeByte( uint8_t reg, uint8_t val);
+    void writeByte(uint8_t reg, uint8_t val);
+    void writeReg(uint8_t reg);
+
 
   
   private:

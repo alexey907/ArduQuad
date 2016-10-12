@@ -8,11 +8,11 @@
 
 #define ALT_HOLD_THRESHOLD 10
 #define ALT_HOLD_CYCLES 100
-#define ALT_HOLD_MIN_THROTTLE 1200
+#define ALT_HOLD_MIN_THROTTLE 200
 
 class BaroAltHold{
   public:
-    BaroAltHold(AFBMP180* pBaro, MPUBase* pMPU);
+    BaroAltHold(IBaro* pBaro, MPUBase* pMPU);
     int update (int throttle);
     bool isOn();
     int getValue();
@@ -20,7 +20,7 @@ class BaroAltHold{
 
     boolean isArmed(int throttle);
     
-    AFBMP180* m_pBaro;
+    IBaro* m_pBaro;
     MPUBase* m_pMPU; 
    
     PID m_PID = PID(ALT_KP, ALT_KD, ALT_KI);
@@ -31,9 +31,8 @@ class BaroAltHold{
     int m_value = 0;
     
     float m_altVelo = 0;
+    float m_alt = 0;
+    
     float m_altTarget = 0;
-    
-    
-    
 };
 #endif

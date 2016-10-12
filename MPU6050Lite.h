@@ -138,7 +138,7 @@
 
 class MPU6050Lite: public MPUBase {
   public:
- virtual void setXAccelOffset(int16_t offset);
+    virtual void setXAccelOffset(int16_t offset);
     virtual void setYAccelOffset(int16_t offset);
     virtual void setZAccelOffset(int16_t offset);
     virtual void setXGyroOffset(int16_t offset);

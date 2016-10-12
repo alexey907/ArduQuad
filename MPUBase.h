@@ -121,11 +121,14 @@ class MPUBase {
     FVector3D* getGyro();
     FVector3D* getAccel();
     FVector3D* getAngles();
+    FVector3D* getWorldAccel();
+    
 
     void setGyroFilter(float gyroFilter);
     void setAccelFilter(float accelFilter);
 
     void updateIMUData();
+    
     bool calibrate ();
     
 
@@ -141,6 +144,8 @@ class MPUBase {
     FVector3D m_acc;
     FVector3D m_gyro;
     FVector3D m_mag;
+    FVector3D m_worldAccel;
+    
 
     FVector3D m_gyroAngle;
     float m_gyroFilter = GYRO_LPF;
@@ -151,8 +156,10 @@ class MPUBase {
     FVector3D m_calibrateGyroAvg;
     FVector3D m_calibrateGyroOff;
     FVector3D m_calibrateAccOff;
-    
 
+    void recalc();
+    boolean m_needRecalc = true;;
+    
 
 };
 

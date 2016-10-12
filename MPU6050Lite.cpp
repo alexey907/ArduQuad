@@ -5,37 +5,6 @@
 
 
 
-
-/*
-void MPU6050Lite::initMagnetometer() {
-  m_pDevice->writeByte(MPU_ADDR, REG_INT_PIN_CFG, 0x22);
-  Serial.print("Magnetometer ID:");
-
-  Serial.println(readByte(AK8963_ADDR, 0));
-
-
-  m_pDevice->writeByte(AK8963_ADDR, AK8963_RA_CNTL, 0x00); // Power down magnetometer
-  delay(10);
-  m_pDevice->writeByte(AK8963_ADDR, AK8963_RA_CNTL, 0x0F); // Enter Fuse ROM access mode
-  delay(10);
-
-  float mcx =  (float)(readByte(AK8963_ADDR, AK8963_RA_ASAX) - 128) / 256. + 1.; // Return x-axis sensitivity adjustment values, etc.
-  float mcy =  (float)(readByte(AK8963_ADDR, AK8963_RA_ASAY) - 128) / 256. + 1.;
-  float mcz =  (float)(readByte(AK8963_ADDR, AK8963_RA_ASAZ) - 128) / 256. + 1.;
-  m_pDevice->writeByte(AK8963_ADDR, AK8963_RA_CNTL, 0x00); // Power down magnetometer
-  delay(10);
-  // Configure the magnetometer for continuous read and highest resolution
-  // set Mscale bit 4 to 1 (0) to enable 16 (14) bit resolution in CNTL register,
-  // and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
-  m_pDevice->writeByte(AK8963_ADDR, AK8963_RA_CNTL, MFS_16BITS << 4 | MFS_MODE_100HZ); // Set magnetometer data resolution and sample ODR
-
-}*/
-/*
-int16_t MPU6050Lite::getXAccelOffset() {
-  return (((m_pDevice->readByte(REG_XA_OFFS_H) << 7) & 0x7F80) |
-         ((m_pDevice->readByte(REG_XA_OFFS_L) >> 1) & 0x7F));
-}
-*/
 void MPU6050Lite::setXAccelOffset(int16_t offset) {
   m_pDevice->writeByte(REG_XA_OFFS_H, offset >> 7);
   m_pDevice->writeByte(REG_XA_OFFS_L, (offset << 1) & 0xFF);

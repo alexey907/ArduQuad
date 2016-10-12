@@ -3,8 +3,8 @@
 #include <Arduino.h>
 #include "LPF.h"
 
-#define LIPO1S_MIN 3000
-#define LIPO1S_MAX 4200
+#define LIPO1S_MIN 3200
+#define LIPO1S_MAX 4300
 #define USB_MAX 5000
 
 

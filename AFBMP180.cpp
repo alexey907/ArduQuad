@@ -30,6 +30,11 @@ void AFBMP180::begin(TwoWire* pWire) {
 
   m_pDevice = new I2CDevice(pWire, BMP180_ADDR);
   m_lpfPressure.setFeedback(0.5);
+  if (m_pDevice->readByte(0xD0) != 0x55){
+    Serial.println("AFBMP180 barometer not found");
+    Serial.println(m_pDevice->readByte(0xD0), HEX );
+   // while(true);
+  }
   
   m_cal.ac1 = m_pDevice->readInt(0xAA);
   m_cal.ac2 = m_pDevice->readInt(0xAC);

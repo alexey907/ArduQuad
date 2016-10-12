@@ -3,12 +3,12 @@
 #include "ArduQuad.h"
 
 
-TrigAtan atan2_;
+
 
 void MPUBase::enable(TwoWire* pWire) {
-  
+
   m_pDevice = new I2CDevice(pWire, MPU_ADDR);
-  
+
   pinMode(9, OUTPUT);
   digitalWrite(9, LOW);
   delay(200);
@@ -32,14 +32,11 @@ void MPUBase::enable(TwoWire* pWire) {
   setGyroDLPFConfig(G_DLPF_CFG_2100HZ_NOLPF);
   setAccelDLPFConfig(A_DLPF_CFG_NOLPF);
 
- // initMagnetometer();
-
-
 
 
 }
 /*
-void MPUBase::initMagnetometer() {
+  void MPUBase::initMagnetometer() {
   m_pDevice->writeByte(MPUBase_ADDR, REG_INT_PIN_CFG, 0x22);
   Serial.print("Magnetometer ID:");
 
@@ -61,19 +58,19 @@ void MPUBase::initMagnetometer() {
   // and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
   m_pDevice->writeByte(AK8963_ADDR, AK8963_RA_CNTL, MFS_16BITS << 4 | MFS_MODE_100HZ); // Set magnetometer data resolution and sample ODR
 
-}*/
+  }*/
 
 
 
 void MPUBase::getMotionData(FVector3D* acc, FVector3D* gyro) {
   getMotionDataRaw(acc, gyro);
-  acc->z += ACC_1G;
+  // acc->z += ACC_1G;
   acc->div(ACC_1G);
   gyro->mult(GYRO_TO_RADPS);
 
 }
 /*
-void MPUBase::getCompasData(FVector3D* mag) {
+  void MPUBase::getCompasData(FVector3D* mag) {
   Wire.beginTransmission(AK8963_ADDR);
   Wire.write(AK8963_RA_XOUT_L);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -85,7 +82,7 @@ void MPUBase::getCompasData(FVector3D* mag) {
   if (st2 & 0x08) {
     mag->x = mag->y = mag->z = 0;
   }
-}*/
+  }*/
 
 void MPUBase::setGyroFilter(float gyroFilter) {
   m_gyroFilter = gyroFilter;
@@ -105,7 +102,8 @@ void MPUBase::updateIMUData() {
 
   m_acc.lpf(acc, m_accelFilter);
   m_gyro.lpf(gyro, m_gyroFilter);
- // m_mag.lpf(mag, MAG_LPF);
+  m_needRecalc = true;
+  // m_mag.lpf(mag, MAG_LPF);
 }
 
 //rotation speed around the axis in RAD/sec
@@ -119,10 +117,21 @@ FVector3D* MPUBase::getAccel() {
 }
 
 
+FVector3D* MPUBase::getWorldAccel() {
+  recalc();
+  return &m_worldAccel;
+}
+
 FVector3D* MPUBase::getAngles() {
+  recalc();
+  return &m_gyroAngle;
+}
 
+void MPUBase::recalc() {
+  if (!m_needRecalc) {
+    return;
+  }
   FVector3D gyroDelta(m_gyro);
-
   gyroDelta.mult(UPDATE_INTERVAL); //rotation in RADs since the last update
   m_gyroAngle.add(gyroDelta);
 
@@ -135,7 +144,17 @@ FVector3D* MPUBase::getAngles() {
 
   m_gyroAngle.lpf(accAngle, ANGLE_LPF);
 
-  return &m_gyroAngle;
+  m_worldAccel.set(m_acc);
+
+  m_worldAccel.rotateX(m_gyroAngle.x);
+  m_worldAccel.rotateY(m_gyroAngle.y);
+
+  m_worldAccel.z -= 1.0;
+  m_needRecalc = false;
+
+
+
+
 }
 
 
@@ -151,34 +170,35 @@ boolean MPUBase::calibrate () {
   m_calibrateCount++;
   if ((m_calibrateCount % CAL_STEP) == 0) {
     m_calibrateAccAvg.div(CAL_STEP);
-    m_calibrateAccAvg.print(&Serial); 
+    m_calibrateAccAvg.z -= ACC_1G;
+    m_calibrateAccAvg.print(&Serial);
     Serial.println();
-    
-    m_calibrateAccAvg.div(10);
-    
-    m_calibrateAccOff.sub(m_calibrateAccAvg);
-    
-    setXAccelOffset(m_calibrateAccOff.x);
-   // Serial.print(m_calibrateAccOff.x);Serial.println();
-   // Serial.print(getXAccelOffset());Serial.println();
 
-    
-    
+    m_calibrateAccAvg.div(10);
+
+    m_calibrateAccOff.sub(m_calibrateAccAvg);
+
+    setXAccelOffset(m_calibrateAccOff.x);
+    // Serial.print(m_calibrateAccOff.x);Serial.println();
+    // Serial.print(getXAccelOffset());Serial.println();
+
+
+
     setYAccelOffset(m_calibrateAccOff.y);
     setZAccelOffset(m_calibrateAccOff.z);
 
     m_calibrateGyroAvg.div(CAL_STEP);
-   // Serial.print("gyro=");m_calibrateGyroAvg.print(&Serial); Serial.println();
-    
+    // Serial.print("gyro=");m_calibrateGyroAvg.print(&Serial); Serial.println();
+
     m_calibrateGyroAvg.div(3);
     m_calibrateGyroOff.sub(m_calibrateGyroAvg);
-    
+
     setXGyroOffset(m_calibrateGyroOff.x);
     setYGyroOffset(m_calibrateGyroOff.y);
     setZGyroOffset(m_calibrateGyroOff.z);
 
-  
-    
+
+
     if (m_calibrateAccAvg.mag() < 1.0 && m_calibrateGyroAvg.mag() < 1.0) {
       return true;
     }
