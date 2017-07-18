@@ -1,4 +1,6 @@
 #include "ArduQuad.h"
+#include "ArduQuad.h"
+
 #include "PID.h"
 
 
@@ -16,7 +18,7 @@
 
 Battery batt;
 
-//#define CHECK_RX 1
+#define CHECK_RX 1
 
 PID x_PID(XY_KP, XY_KD, XY_KI);
 PID y_PID(XY_KP, XY_KD, XY_KI);
@@ -39,7 +41,7 @@ GPSPosHold* pGPSPosHold = NULL;//new GPSPosHold(pGeoNav, pCompass, pMPU);
 #elif (BOARD_VERSION == 2)
   #include "MPU6050Lite.h"
   MPUBase* pMPU = new MPU6050Lite();
-  IBaro* pBaro = new MS5611Baro();
+  IBaro* pBaro = NULL;// new MS5611Baro();
 #endif
 BaroAltHold* pBaroAltHold = new BaroAltHold(pBaro, pMPU);
 
@@ -75,6 +77,7 @@ long lastLoop = 0;
 void setup() {
   Serial.begin(250000);
   Serial3.begin(230400);
+
 
   l.print("Board version: "); l.println(BOARD_VERSION);
   l.print("Frame type: "); l.println(FRAME_TYPE);

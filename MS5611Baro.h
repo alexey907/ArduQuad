@@ -26,6 +26,7 @@
 #define CYCLE_TICKS (CYCLE_DURATION / TIME_STEP)
 class MS5611Baro : public IBaro {
   public:
+	virtual ~MS5611Baro();
     void begin(TwoWire* pWire);
     void updateReading();
     bool calibrate();
